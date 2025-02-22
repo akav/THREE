@@ -148,18 +148,15 @@ namespace THREE
 
         public Hashtable GetParameters(Material material, GLLights lights, List<Light> shadows, Object3D scene, Object3D object3D)
         {
+            Fog fog = (scene as Scene)?.Fog;
 
-            Fog fog = scene is Scene ? (scene as Scene).Fog : null;
+            Texture environment = material is MeshStandardMaterial ? (scene as Scene)?.Environment : null;
 
-            Texture environment = material is MeshStandardMaterial ? (scene is Scene ? (scene as Scene).Environment : null) : null;
+            Texture envMap = cubeMaps.Get(material.EnvMap ?? environment);
 
-            Texture envMap = cubeMaps.Get(material.EnvMap != null ? material.EnvMap : environment);
+            string shaderID = shaderIDs.ContainsKey(material.type) ? shaderIDs[material.type] : "";
 
-            string shaderID = "";
-            if (shaderIDs.ContainsKey(material.type))
-                shaderID = shaderIDs[material.type];
-
-            int maxBones = object3D is SkinnedMesh ? GetMaxBones((SkinnedMesh)object3D) : 0;
+            int maxBones = object3D is SkinnedMesh skinnedMesh ? GetMaxBones(skinnedMesh) : 0;
 
             if (!string.IsNullOrEmpty(material.Precision))
             {
@@ -182,188 +179,106 @@ namespace THREE
             }
             else
             {
-                vertexShader = (material as ShaderMaterial).VertexShader;
-                fragmentShader = (material as ShaderMaterial).FragmentShader;
+                vertexShader = (material as ShaderMaterial)?.VertexShader;
+                fragmentShader = (material as ShaderMaterial)?.FragmentShader;
             }
 
             GLRenderTarget currentRenderTarget = this.renderer.GetRenderTarget();
 
-            //int numMultiviewViews = currentRenderTarget != null && currentRenderTarget.IsGLMultiviewRenderTarget ? currentRenderTarget.NumViews : 0;
-
-            Hashtable parameters = new Hashtable();
-            parameters.Add("isGL2", isGL2);
-
-            parameters.Add("shaderId", shaderID);
-
-            parameters.Add("shaderName", material.type);
-
-            parameters.Add("vertexShader", vertexShader);
-            parameters.Add("fragmentShader", fragmentShader);
-            parameters.Add("defines", material.Defines);
-            parameters.Add("isRawShaderMaterial", material is RawShaderMaterial);
-            parameters.Add("glslVersion", material.glslVersion);
-
-            parameters.Add("precision", precision);
-
-            parameters.Add("instancing", object3D is InstancedMesh ? true : false);
-            parameters.Add("instancingColor", object3D is InstancedMesh && (object3D as InstancedMesh).InstanceColor != null);
-            parameters.Add("supportsVertexTextures", vertexTextures);
-
-            //parameters.Add("numMultiviewViews",numMultiviewViews);
-
-            parameters.Add("outputEncoding", GetTextureEncodingFromMap(currentRenderTarget == null ? null : currentRenderTarget.Texture));
-
-            parameters.Add("map", material.Map != null);
-
-            parameters.Add("mapEncoding", GetTextureEncodingFromMap(material.Map));
-
-            parameters.Add("matcap", material is MeshMatcapMaterial ? (material as MeshMatcapMaterial).Matcap != null : false);
-
-            parameters.Add("matcapEncoding", material is MeshMatcapMaterial ? GetTextureEncodingFromMap((material as MeshMatcapMaterial).Matcap) : Constants.LinearEncoding);
-
-            parameters.Add("envMap", envMap != null);
-
-            parameters.Add("envMapMode", material.EnvMap != null ? material.EnvMap.Mapping : (int?)null);
-
-            parameters.Add("envMapEncoding", GetTextureEncodingFromMap(material.EnvMap));
-
-            parameters.Add("envMapCubeUV", material.EnvMap != null && ((material.EnvMap.Mapping == Constants.CubeUVReflectionMapping) || (material.EnvMap.Mapping == Constants.CubeUVRefractionMapping)));
-
-            parameters.Add("lightMap", material.LightMap != null);
-
-            parameters.Add("lightMapEncoding", GetTextureEncodingFromMap(material.LightMap));
-
-            parameters.Add("aoMap", material.AoMap != null);
-
-            parameters.Add("emissiveMap", material.EmissiveMap != null);
-
-            parameters.Add("emissiveMapEncoding", GetTextureEncodingFromMap(material.EmissiveMap));
-
-            parameters.Add("bumpMap", material.BumpMap != null);
-
-            parameters.Add("normalMap", material.NormalMap != null);
-
-            parameters.Add("objectSpaceNormalMap", material.NormalMapType == Constants.ObjectSpaceNormalMap);
-
-            parameters.Add("tangentSpaceNormalMap", material.NormalMapType == Constants.TangentSpaceNormalMap);
-
-            parameters.Add("clearcoatMap", material.ClearcoatMap != null);
-
-            parameters.Add("clearcoatRoughnessMap", material.ClearcoatRoughnessMap != null);
-
-            parameters.Add("clearcoatNormalMap", material.ClearcoatNormalMap != null);
-
-            parameters.Add("displacementMap", material.DisplacementMap != null);
-
-            parameters.Add("roughnessMap", material.RoughnessMap != null);
-
-            parameters.Add("metalnessMap", material.MetalnessMap != null);
-
-            parameters.Add("specularMap", material.SpecularMap != null);
-
-            parameters.Add("alphaMap", material.AlphaMap != null);
-
-            parameters.Add("gradientMap", material.GradientMap != null);
-
-            parameters.Add("sheen", material.Sheen != null);
-
-            parameters.Add("transmission", material.Transmission > 0);
-
-            parameters.Add("combine", material.Combine != 0 ? material.Combine : (int?)null);
-
-            parameters.Add("transmissionMap", material.TransmissionMap != null);
-
-            parameters.Add("thicknessMap",material.ThicknessMap!=null);            
-
-            parameters.Add("vertexTangents", (material.NormalMap != null && material.VertexTangents));
-
-            parameters.Add("vertexColors", material.VertexColors);
-
-            parameters.Add("vertexAlphas", material.VertexColors && object3D.Geometry != null && object3D.Geometry is BufferGeometry && (object3D.Geometry as BufferGeometry).Attributes["color"] != null && ((object3D.Geometry as BufferGeometry).Attributes["color"] as IGLAttribute).ItemSize == 4);
-
-            parameters.Add("vertexUvs", material.Map != null || material.BumpMap != null || material.NormalMap != null || material.SpecularMap != null || material.AlphaMap != null || material.EmissiveMap != null || material.RoughnessMap != null || material.MetalnessMap != null || material.ClearcoatNormalMap != null);
-
-            parameters.Add("uvsVertexOnly", !(material.Map != null || material.BumpMap != null || material.NormalMap != null || material.SpecularMap != null || material.AlphaMap != null || material.EmissiveMap != null || material.RoughnessMap != null || material.MetalnessMap != null || material.ClearcoatNormalMap != null) && material.DisplacementMap != null);
-
-            parameters.Add("fog", fog != null);
-
-            parameters.Add("useFog", material.Fog);
-
-            parameters.Add("fogExp2", (fog != null && fog is FogExp2));
-
-            parameters.Add("flatShading", material.FlatShading);
-
-            parameters.Add("sizeAttenuation", material.SizeAttenuation);
-
-            parameters.Add("logarithmicDepthBuffer", logarithmicDepthBuffer);
-
-            parameters.Add("skinning", material.Skinning && maxBones > 0);
-
-            parameters.Add("maxBones", maxBones);
-
-            parameters.Add("useVertexTexture", floatVertexTextures);
-
-            parameters.Add("morphTargets", material.MorphTargets);
-
-            parameters.Add("morphNormals", material.MorphNormals);
-
-            parameters.Add("maxMorphTargets", renderer.MaxMorphTargets);
-
-            parameters.Add("maxMorphNormals", renderer.MaxMorphNormals);
-
-            parameters.Add("numDirLights", lights.state["directional"] != null ? (lights.state["directional"] as GLUniform[]).Length : 0);
-
-            parameters.Add("numPointLights", lights.state["point"] != null ? (lights.state["point"] as GLUniform[]).Length : 0);
-
-            parameters.Add("numSpotLights", lights.state["spot"] != null ? (lights.state["spot"] as GLUniform[]).Length : 0);
-
-            parameters.Add("numRectAreaLights", lights.state["rectArea"] != null ? (lights.state["rectArea"] as GLUniform[]).Length : 0);
-
-            parameters.Add("numHemiLights", lights.state["hemi"] != null ? (lights.state["hemi"] as GLUniform[]).Length : 0);
-
-            parameters.Add("numDirLightShadows", lights.state["directionalShadowMap"] != null ? (lights.state["directionalShadowMap"] as Texture[]).Length : 0);
-
-            parameters.Add("numPointLightShadows", lights.state["pointShadowMap"] != null ? (lights.state["pointShadowMap"] as Texture[]).Length : 0);
-
-            parameters.Add("numSpotLightShadows", lights.state["spotShadowMap"] != null ? (lights.state["spotShadowMap"] as Texture[]).Length : 0);
-
-            parameters.Add("numClippingPlanes", clipping.numPlanes);
-            parameters.Add("numClipIntersection", clipping.numIntersection);
-
-            parameters.Add("dithering", material.Dithering);
-
-            parameters.Add("shadowMapEnabled", renderer.ShadowMap.Enabled && shadows.Count > 0);
-            parameters.Add("shadowMapType", renderer.ShadowMap.type);
-
-            parameters.Add("toneMapping", material.ToneMapped ? renderer.ToneMapping : Constants.NoToneMapping);
-            parameters.Add("physicallyCorrectLights", renderer.PhysicallyCorrectLights);
-
-            parameters.Add("premultipliedAlpha", material.PremultipliedAlpha);
-
-            parameters.Add("alphaTest", material.AlphaTest);
-            parameters.Add("doubleSided", material.Side == Constants.DoubleSide);
-            parameters.Add("flipSided", material.Side == Constants.BackSide);
-
-            parameters.Add("depthPacking", material is MeshDepthMaterial ? (material as MeshDepthMaterial).DepthPacking : 0);
-
-            parameters.Add("indexOfAttributeName", material.IndexOAttributeName);
-
-            parameters.Add("extensionDerivatives", (material is ShaderMaterial) && (material as ShaderMaterial).extensions.derivatives);
-
-            parameters.Add("extensionFragDepth", (material is ShaderMaterial) && (material as ShaderMaterial).extensions.fragDepth);
-
-            parameters.Add("extensionDrawBuffers", (material is ShaderMaterial) && (material as ShaderMaterial).extensions.drawBuffers);
-
-            parameters.Add("extensionShaderTextureLOD", (material is ShaderMaterial) && (material as ShaderMaterial).extensions.shaderTextureLOD);
-
-            parameters.Add("rendererExtensionFragDepth", isGL2 || extensions.Get("EXT_frag_depth") > -1);
-
-
-            parameters.Add("rendererExtensionDrawBuffers", isGL2 || extensions.Get("GL_draw_buffers") > -1);
-
-            parameters.Add("rendererExtensionShaderTextureLOD", isGL2 || extensions.Get("EXT_shader_texture_lod") > -1);
-
-            parameters.Add("customProgramCacheKey", material.customProgramCacheKey);
+            Hashtable parameters = new Hashtable
+            {
+                { "isGL2", isGL2 },
+                { "shaderId", shaderID },
+                { "shaderName", material.type },
+                { "vertexShader", vertexShader },
+                { "fragmentShader", fragmentShader },
+                { "defines", material.Defines },
+                { "isRawShaderMaterial", material is RawShaderMaterial },
+                { "glslVersion", material.glslVersion },
+                { "precision", precision },
+                { "instancing", object3D is InstancedMesh },
+                { "instancingColor", object3D is InstancedMesh instancedMesh && instancedMesh.InstanceColor != null },
+                { "supportsVertexTextures", vertexTextures },
+                { "outputEncoding", GetTextureEncodingFromMap(currentRenderTarget?.Texture) },
+                { "map", material.Map != null },
+                { "mapEncoding", GetTextureEncodingFromMap(material.Map) },
+                { "matcap", material is MeshMatcapMaterial matcapMaterial && matcapMaterial.Matcap != null },
+                { "matcapEncoding", material is MeshMatcapMaterial ? GetTextureEncodingFromMap((material as MeshMatcapMaterial)?.Matcap) : Constants.LinearEncoding },
+                { "envMap", envMap != null },
+                { "envMapMode", material.EnvMap?.Mapping },
+                { "envMapEncoding", GetTextureEncodingFromMap(material.EnvMap) },
+                { "envMapCubeUV", material.EnvMap != null && (material.EnvMap.Mapping == Constants.CubeUVReflectionMapping || material.EnvMap.Mapping == Constants.CubeUVRefractionMapping) },
+                { "lightMap", material.LightMap != null },
+                { "lightMapEncoding", GetTextureEncodingFromMap(material.LightMap) },
+                { "aoMap", material.AoMap != null },
+                { "emissiveMap", material.EmissiveMap != null },
+                { "emissiveMapEncoding", GetTextureEncodingFromMap(material.EmissiveMap) },
+                { "bumpMap", material.BumpMap != null },
+                { "normalMap", material.NormalMap != null },
+                { "objectSpaceNormalMap", material.NormalMapType == Constants.ObjectSpaceNormalMap },
+                { "tangentSpaceNormalMap", material.NormalMapType == Constants.TangentSpaceNormalMap },
+                { "clearcoatMap", material.ClearcoatMap != null },
+                { "clearcoatRoughnessMap", material.ClearcoatRoughnessMap != null },
+                { "clearcoatNormalMap", material.ClearcoatNormalMap != null },
+                { "displacementMap", material.DisplacementMap != null },
+                { "roughnessMap", material.RoughnessMap != null },
+                { "metalnessMap", material.MetalnessMap != null },
+                { "specularMap", material.SpecularMap != null },
+                { "alphaMap", material.AlphaMap != null },
+                { "gradientMap", material.GradientMap != null },
+                { "sheen", material.Sheen != null },
+                { "transmission", material.Transmission > 0 },
+                { "combine", material.Combine != 0 ? material.Combine : (int?)null },
+                { "transmissionMap", material.TransmissionMap != null },
+                { "thicknessMap", material.ThicknessMap != null },
+                { "vertexTangents", material.NormalMap != null && material.VertexTangents },
+                { "vertexColors", material.VertexColors },
+                { "vertexAlphas", material.VertexColors && object3D.Geometry is BufferGeometry bufferGeometry && bufferGeometry.Attributes.ContainsKey("color") && bufferGeometry.Attributes["color"] is IGLAttribute colorAttribute && colorAttribute.ItemSize == 4 },
+                { "vertexUvs", material.Map != null || material.BumpMap != null || material.NormalMap != null || material.SpecularMap != null || material.AlphaMap != null || material.EmissiveMap != null || material.RoughnessMap != null || material.MetalnessMap != null || material.ClearcoatNormalMap != null },
+                { "uvsVertexOnly", !(material.Map != null || material.BumpMap != null || material.NormalMap != null || material.SpecularMap != null || material.AlphaMap != null || material.EmissiveMap != null || material.RoughnessMap != null || material.MetalnessMap != null || material.ClearcoatNormalMap != null) && material.DisplacementMap != null },
+                { "fog", fog != null },
+                { "useFog", material.Fog },
+                { "fogExp2", fog is FogExp2 },
+                { "flatShading", material.FlatShading },
+                { "sizeAttenuation", material.SizeAttenuation },
+                { "logarithmicDepthBuffer", logarithmicDepthBuffer },
+                { "skinning", material.Skinning && maxBones > 0 },
+                { "maxBones", maxBones },
+                { "useVertexTexture", floatVertexTextures },
+                { "morphTargets", material.MorphTargets },
+                { "morphNormals", material.MorphNormals },
+                { "maxMorphTargets", renderer.MaxMorphTargets },
+                { "maxMorphNormals", renderer.MaxMorphNormals },
+                { "numDirLights", lights.state["directional"] is GLUniform[] directional ? directional.Length : 0 },
+                { "numPointLights", lights.state["point"] is GLUniform[] point ? point.Length : 0 },
+                { "numSpotLights", lights.state["spot"] is GLUniform[] spot ? spot.Length : 0 },
+                { "numRectAreaLights", lights.state["rectArea"] is GLUniform[] rectArea ? rectArea.Length : 0 },
+                { "numHemiLights", lights.state["hemi"] is GLUniform[] hemi ? hemi.Length : 0 },
+                { "numDirLightShadows", lights.state["directionalShadowMap"] is Texture[] directionalShadowMap ? directionalShadowMap.Length : 0 },
+                { "numPointLightShadows", lights.state["pointShadowMap"] is Texture[] pointShadowMap ? pointShadowMap.Length : 0 },
+                { "numSpotLightShadows", lights.state["spotShadowMap"] is Texture[] spotShadowMap ? spotShadowMap.Length : 0 },
+                { "numClippingPlanes", clipping.numPlanes },
+                { "numClipIntersection", clipping.numIntersection },
+                { "dithering", material.Dithering },
+                { "shadowMapEnabled", renderer.ShadowMap.Enabled && shadows.Count > 0 },
+                { "shadowMapType", renderer.ShadowMap.type },
+                { "toneMapping", material.ToneMapped ? renderer.ToneMapping : Constants.NoToneMapping },
+                { "physicallyCorrectLights", renderer.PhysicallyCorrectLights },
+                { "premultipliedAlpha", material.PremultipliedAlpha },
+                { "alphaTest", material.AlphaTest },
+                { "doubleSided", material.Side == Constants.DoubleSide },
+                { "flipSided", material.Side == Constants.BackSide },
+                { "depthPacking", material is MeshDepthMaterial meshDepthMaterial ? meshDepthMaterial.DepthPacking : 0 },
+                { "indexOfAttributeName", material.IndexOAttributeName },
+                { "extensionDerivatives", material is ShaderMaterial shaderMaterial && shaderMaterial.extensions.derivatives },
+                { "extensionFragDepth", material is ShaderMaterial shaderFragMaterial && shaderFragMaterial.extensions.fragDepth },
+                { "extensionDrawBuffers", material is ShaderMaterial shaderDrawMaterial && shaderDrawMaterial.extensions.drawBuffers },
+                { "extensionShaderTextureLOD", material is ShaderMaterial shaderLODMaterial && shaderLODMaterial.extensions.shaderTextureLOD },
+                { "rendererExtensionFragDepth", isGL2 || extensions.Get("EXT_frag_depth") > -1 },
+                { "rendererExtensionDrawBuffers", isGL2 || extensions.Get("GL_draw_buffers") > -1 },
+                { "rendererExtensionShaderTextureLOD", isGL2 || extensions.Get("EXT_shader_texture_lod") > -1 },
+                { "customProgramCacheKey", material.customProgramCacheKey }
+            };
 
             return parameters;
         }

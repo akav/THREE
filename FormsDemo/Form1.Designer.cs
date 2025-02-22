@@ -139,10 +139,7 @@ namespace FormsDemo
             glControl.KeyDown += glControl_KeyDown;
             glControl.KeyPress += glControl_KeyPress;
             glControl.KeyUp += glControl_KeyUp;
-            glControl.MouseDown += glControl_MouseDown;
-            glControl.MouseEnter += glControl_MouseEnter;
-            glControl.MouseLeave += glControl_MouseLeave;
-            glControl.MouseHover += glControl_MouseHover;
+            glControl.MouseDown += glControl_MouseDown;            
             glControl.MouseMove += glControl_MouseMove;
             glControl.MouseUp += glControl_MouseUp;
             glControl.PreviewKeyDown += glControl_PreviewKeyDown;

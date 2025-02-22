@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="LearningThreeJs\Chapter11\**" />
     <Compile Remove="ThreeJs\Clipping\**" />
@@ -29,7 +27,6 @@
     <None Remove="ThreeJs\Interactive\**" />
     <None Remove="ThreeJs\Modifier\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="LearningThreeJs\Chapter07\ProgrambasedPointsGL.cs" />
     <Compile Remove="LearningThreeJs\Chapter07\ProgramBasedSprites.cs" />
@@ -37,7 +34,6 @@
     <Compile Remove="ThreeJs\Buffergeometry\BuffergeometryPointsInterleaved.cs" />
     <Compile Remove="ThreeJs\Buffergeometry\BuffergeometryUintExample.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Include="ThreeJs\Clipping\ClippingExample.cs" />
     <Compile Include="ThreeJs\Clipping\ClippingIntersectionExample.cs" />
@@ -58,10 +54,8 @@
     <Compile Include="ThreeJs\Geometries\TeapotExample.cs" />
     <Compile Include="ThreeJs\Interactive\InteractiveCubesExample.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\THREE.Silk\THREE.Silk.csproj" />
     <ProjectReference Include="..\THREE\THREE.csproj" />
   </ItemGroup>
-
 </Project>

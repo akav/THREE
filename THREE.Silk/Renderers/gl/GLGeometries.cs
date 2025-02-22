@@ -63,44 +63,45 @@ namespace THREE
 
         public void Update(Geometry geometry)
         {
-            //var index = ((BufferGeometry)geometry).Index;
-            var geometryAttributes = ((BufferGeometry)geometry).Attributes;
-
-            // Updating index buffer in VAO now. See GLBindingStates.
-            //if (index != null)
-            //{
-            //    Attributes.Update<int>(index, BufferTarget.ElementArrayBuffer);
-            //}
-
-            foreach (string name in geometryAttributes.Keys)
+            if (geometry is not BufferGeometry bufferGeometry)
             {
-                if (geometryAttributes[name] is BufferAttribute<float>)
-                    Attributes.Update<float>((BufferAttribute<float>)geometryAttributes[name], GLEnum.ArrayBuffer);
-
-                if (geometryAttributes[name] is BufferAttribute<int>)
-                    Attributes.Update<int>((BufferAttribute<int>)geometryAttributes[name], GLEnum.ArrayBuffer);
-
-                if (geometryAttributes[name] is BufferAttribute<uint>)
-                    Attributes.Update<uint>((BufferAttribute<uint>)geometryAttributes[name], GLEnum.ArrayBuffer);
-
-                if (geometryAttributes[name] is BufferAttribute<byte>)
-                    Attributes.Update<byte>((BufferAttribute<byte>)geometryAttributes[name], GLEnum.ArrayBuffer);
-
-                if (geometryAttributes[name] is BufferAttribute<ushort>)
-                    Attributes.Update<ushort>((BufferAttribute<ushort>)geometryAttributes[name], GLEnum.ArrayBuffer);
+                throw new ArgumentException("Expected geometry to be of type BufferGeometry", nameof(geometry));
             }
 
-            // morph targets
+            var geometryAttributes = bufferGeometry.Attributes;
 
-            var morphAttributes = (geometry as BufferGeometry).MorphAttributes;
-
-            foreach (string name in morphAttributes.Keys)
+            foreach (var attribute in geometryAttributes.Values)
             {
-                List<BufferAttribute<float>> array = (List<BufferAttribute<float>>)morphAttributes[name];
-
-                for (int i = 0; i < array.Count; i++)
+                switch (attribute)
                 {
-                    Attributes.Update<float>(array[i], GLEnum.ArrayBuffer);
+                    case BufferAttribute<float> floatAttribute:
+                        Attributes.Update(floatAttribute, GLEnum.ArrayBuffer);
+                        break;
+                    case BufferAttribute<int> intAttribute:
+                        Attributes.Update(intAttribute, GLEnum.ArrayBuffer);
+                        break;
+                    case BufferAttribute<uint> uintAttribute:
+                        Attributes.Update(uintAttribute, GLEnum.ArrayBuffer);
+                        break;
+                    case BufferAttribute<byte> byteAttribute:
+                        Attributes.Update(byteAttribute, GLEnum.ArrayBuffer);
+                        break;
+                    case BufferAttribute<ushort> ushortAttribute:
+                        Attributes.Update(ushortAttribute, GLEnum.ArrayBuffer);
+                        break;
+                }
+            }
+
+            var morphAttributes = bufferGeometry.MorphAttributes;
+
+            foreach (var array in morphAttributes.Values)
+            {
+                if (array is List<BufferAttribute<float>> floatArray)
+                {
+                    foreach (var attribute in floatArray)
+                    {
+                        Attributes.Update(attribute, GLEnum.ArrayBuffer);
+                    }
                 }
             }
         }

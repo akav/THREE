@@ -24,7 +24,12 @@ namespace THREEExample.ThreeJs.Instancing
         }
         public override void InitCamera()
         {
-            camera = new THREE.PerspectiveCamera(60, ClientRectangle.Width / ClientRectangle.Height, 0.1f, 100);
+            if (ClientRectangle.Width == 0 || ClientRectangle.Height == 0)
+            {
+                throw new InvalidOperationException("ClientRectangle dimensions must be non-zero.");
+            }
+
+            camera = new THREE.PerspectiveCamera(60, (float)ClientRectangle.Width / ClientRectangle.Height, 0.1f, 100);
             camera.Position.Set(amount * 0.9f, amount * 0.9f, amount * 0.9f);
             camera.LookAt(0, 0, 0);
         }

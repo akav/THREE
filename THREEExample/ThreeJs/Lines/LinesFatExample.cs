@@ -116,8 +116,11 @@ namespace THREEExample
             insetWidth = glControl.Width / 4; // square
             insetHeight = glControl.Height / 4;
 
-            camera2.Aspect = insetWidth / insetHeight;
-            camera2.UpdateProjectionMatrix();
+            if (insetHeight != 0)
+            {
+                camera2.Aspect = insetWidth / (float)insetHeight;
+                camera2.UpdateProjectionMatrix();
+            }
         }
         private void GuiControls()
         {

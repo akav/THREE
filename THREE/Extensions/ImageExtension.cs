@@ -24,7 +24,7 @@ namespace THREE
 
             return byteArray;
         }
-        public static SKBitmap ToSKBitMap(this byte[] byteArray,int width,int height)
+        public static SKBitmap ToSKBitMap(this byte[] byteArray, int width, int height)
         {
             SKBitmap bitmap = new SKBitmap();
 
@@ -33,7 +33,7 @@ namespace THREE
 
             // install the pixels with the color type of the pixel data
             var info = new SKImageInfo(width, height, SKImageInfo.PlatformColorType, SKAlphaType.Unpremul);
-            bitmap.InstallPixels(info, gcHandle.AddrOfPinnedObject(), info.RowBytes, null, delegate { gcHandle.Free(); }, null);
+            bitmap.InstallPixels(info, gcHandle.AddrOfPinnedObject(), info.RowBytes, (addr, ctx) => gcHandle.Free());
 
             return bitmap;
         }

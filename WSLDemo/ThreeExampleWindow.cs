@@ -238,15 +238,23 @@ namespace WSLDemo
 
             //Application.Idle -= Application_Idle;
 
-            currentExample = (Example)Activator.CreateInstance(e.Example);
-            if (null != currentExample)
+            if (e != null)
             {
-                this.MakeCurrent();
-                currentExample.Load(this);
-                currentExample.imGuiManager = imGuiManager;
-                Title = MakeExampleTitle(e.Attribute.Title);
-                GL.Viewport(0, 0, Width, Height);
-                currentExample.OnResize(new ResizeEventArgs(Width, Height));
+                currentExample = (Example)Activator.CreateInstance(e.Example);
+                if (null != currentExample)
+                {
+                    this.MakeCurrent();
+                    currentExample.Load(this);
+                    currentExample.imGuiManager = imGuiManager;
+                    Title = MakeExampleTitle(e.Attribute.Title);
+                    GL.Viewport(0, 0, Width, Height);
+                    currentExample.OnResize(new ResizeEventArgs(Width, Height));
+                }
+            }
+            else
+            {
+                // Handle the case where e is null
+                Console.WriteLine("Invalid example info.");
             }
         }
         public override void OnLoad()

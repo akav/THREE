@@ -7,7 +7,6 @@
             var demoMainWindow = new SilkDemoWindow();
             demoMainWindow.Render();
             demoMainWindow.window.Dispose();
-
         }
     }
 }

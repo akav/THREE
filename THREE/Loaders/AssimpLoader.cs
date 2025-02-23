@@ -137,7 +137,7 @@ namespace THREE
                         {"color",m.HasColorDiffuse ? new Color(m.ColorDiffuse[0],m.ColorDiffuse[1],m.ColorDiffuse[2]) : null },
                         {"specular",m.HasColorSpecular ? new Color(m.ColorSpecular[0],m.ColorSpecular[1],m.ColorSpecular[2]) : null },
                         {"emissive",m.HasColorEmissive ? new Color(m.ColorEmissive[0],m.ColorEmissive[1],m.ColorEmissive[2]) :null },
-                        {"transparent",m.HasTransparencyFactor? true :false }                        
+                        {"transparent",m.HasColorTransparent? true :false }                        
                     };
                     if(m.HasShininess) parameter["shininess"] = m.Shininess;
                     if (m.HasOpacity) parameter["opacity"] = m.Opacity;

@@ -26,7 +26,7 @@ namespace THREEExample
 #if WSL
         public IThreeWindow glControl;
 #else
-        public GLControl glControl;
+        public GLControl glControl;        
 #endif
 
         public Action AddGuiControlsAction;

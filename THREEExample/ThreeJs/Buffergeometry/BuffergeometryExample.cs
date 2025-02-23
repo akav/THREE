@@ -15,11 +15,7 @@ namespace THREEExample.Three.Buffergeometry
 
         public override void InitCamera()
         {
-            if (glControl.Width == 0 || glControl.Height == 0)
-            {
-                throw new InvalidOperationException("glControl dimensions are not set.");
-            }
-            camera = new PerspectiveCamera(27, glControl.Width / glControl.Height, 1, 3500);
+            camera = new PerspectiveCamera(27, glControl.AspectRatio, 1, 3500);
             camera.Position.Z = 2750;
         }
 

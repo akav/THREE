@@ -67,35 +67,9 @@ namespace THREE
 
         private SKBitmap ResizeImage(SKBitmap image, int width, int height)
         {
-            return image.Resize(new SKImageInfo(width,height), SKFilterQuality.High);
-            //var destRect = new Rectangle(0, 0, width, height);
-            //var destImage = new Bitmap(width, height);
-
-            //destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-
-            //using (var graphics = Graphics.FromImage(destImage))
-            //{
-            //    graphics.CompositingMode = CompositingMode.SourceCopy;
-            //    graphics.CompositingQuality = CompositingQuality.HighQuality;
-            //    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            //    graphics.SmoothingMode = SmoothingMode.HighQuality;
-            //    graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-            //    using (var wrapMode = new ImageAttributes())
-            //    {
-            //        wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-            //        graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
-            //    }
-            //}
-
-            //return destImage;
+            return image.Resize(new SKImageInfo(width,height), SKFilterQuality.High);            
         }
-
-        //private Bitmap ResizeImage(Bitmap image, int width, int height)
-        //{
-        //    Size resize = new Size(width, height);
-        //    return new Bitmap(image, resize);
-        //}
+                
         private SKBitmap ResizeImage(SKBitmap image, bool needsPowerOfTwo, bool needsNewCanvas, int maxSize)
         {
             float scale = 1.0f;
@@ -113,12 +87,8 @@ namespace THREE
                 {
                     var width = needsPowerOfTwo ? MathUtils.FloorPowerOfTwo(scale * image.Width) : (float)System.Math.Floor(scale * image.Width);
                     var height = needsPowerOfTwo ? MathUtils.FloorPowerOfTwo(scale * image.Height) : (float)System.Math.Floor(scale * image.Height);
-
-
                     image = ResizeImage(image, (int)width, (int)height);
-
                     return image;
-
                 }
                 else
                 {
@@ -132,14 +102,12 @@ namespace THREE
         {
             if (image == null) return false;
             return MathUtils.IsPowerOfTwo(image.Width) && MathUtils.IsPowerOfTwo(image.Height);
-
         }
 
         private bool IsPowerOfTwo(GLRenderTarget image)
         {
             if (image == null) return false;
             return MathUtils.IsPowerOfTwo(image.Width) && MathUtils.IsPowerOfTwo(image.Height);
-
         }
 
         private bool TextureNeedsPowerOfTwo(Texture texture)
@@ -188,25 +156,20 @@ namespace THREE
                 if (glType == (int)All.Float) internalFormat = (int)All.R32f;
                 if (glType == (int)All.HalfFloat) internalFormat = (int)All.R16f;
                 if (glType == (int)All.UnsignedByte) internalFormat = (int)All.R8;
-
             }
 
             if (glFormat == (int)All.Rgb)
             {
-
                 if (glType == (int)All.Float) internalFormat = (int)All.Rgb32f;
                 if (glType == (int)All.HalfFloat) internalFormat = (int)All.Rgb16f;
                 if (glType == (int)All.UnsignedByte) internalFormat = (int)All.Rgb8;
-
             }
 
             if (glFormat == (int)All.Rgba)
             {
-
                 if (glType == (int)All.Float) internalFormat = (int)All.Rgba32f;
                 if (glType == (int)All.HalfFloat) internalFormat = (int)All.Rgba16f;
                 if (glType == (int)All.UnsignedByte) internalFormat = (int)All.Rgba8;
-
             }
 
             if (internalFormat == (int)All.R16f || internalFormat == (int)All.R32f ||
@@ -514,7 +477,7 @@ namespace THREE
 
 
                             //state.TexImage2D(targets[i], 0, (TextureComponentCount)glInternalFormat, data.Width,data.Height,0,(OpenTK.Graphics.ES30.PixelFormat)glFormat, (PixelType)glType, data.Scan0);
-                            GL.TexImage2D((All)targets[i], 0, (All)glInternalFormat, localImage.Width, localImage.Height, 0, All.BgraImg, glType, localImage.Bytes);
+                            GL.TexImage2D(targets[i], 0, (TextureComponentCount)glInternalFormat, localImage.Width, localImage.Height, 0, (PixelFormat)All.BgraImg, (PixelType)glType, localImage.GetPixels());
 
                             for (var j = 0; j < mipmaps.Count; j++)
                             {
@@ -826,7 +789,7 @@ namespace THREE
                         //var data = image1.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);//System.Drawing.Imaging.PixelFormat.Format32bppArgb);                   
                         //image1.UnlockBits(data);
                         byte[] data = new byte[image.Width * image.Height * 4];
-                        GL.TexImage2D(All.Texture2D, 0, (All)glInternalFormat, image.Width, image.Height, 0, All.BgraImg, glType, data.ToSKBitMap(image.Width, image.Height).Bytes);
+                        GL.TexImage2D(TextureTarget2d.Texture2D, 0, (TextureComponentCount)glInternalFormat, image.Width, image.Height, 0, PixelFormat.Bgra, (PixelType)glType, data.ToSKBitMap(image.Width, image.Height).GetPixels());
 
                         textureProperties["maxMipLevel"] = 0;
                     }
@@ -932,44 +895,19 @@ namespace THREE
 
                 }
                 else
-                {
-
-                    //image.RotateFlip(RotateFlipType.RotateNoneFlipY);
-
-                    //var data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);//System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                    //state.TexImage2D(TextureTarget2d.Texture2D, 0, (TextureComponentCount)glInternalFormat, image.Width, image.Height, 0, (OpenTK.Graphics.ES30.PixelFormat)glType, PixelType.UnsignedByte, data.Scan0);
-                    //state.TexImage2D(TextureTarget2d.Texture2D, 0, TextureComponentCount.Rgba, image.Width, image.Height, 0, OpenTK.Graphics.ES30.PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
-                    //OpenTK.Graphics.OpenGL.GL.TexImage2D(OpenTK.Graphics.OpenGL.TextureTarget.Texture2D,
-                    //    0,
-                    //    OpenTK.Graphics.OpenGL.PixelInternalFormat.Rgb,
-                    //    data.Width,
-                    //    data.Height,
-                    //    0,
-                    //    OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
-                    //    OpenTK.Graphics.OpenGL.PixelType.UnsignedByte,
-                    //    data.Scan0);
-                    GL.TexImage2D(All.Texture2D, 0, (All)glInternalFormat, image.Width, image.Height, 0, All.BgraImg, glType, image.Bytes);
-                    //image.UnlockBits(data);
-
-                    //byte[] pixels = image.GetTextureImage();
-                    //state.TexImage2D(TextureTarget2d.Texture2D, 0, (TextureComponentCount)glInternalFormat, image.Width, image.Height, 0, (OpenTK.Graphics.ES30.PixelFormat)glType, PixelType.UnsignedByte, pixels);
-
+                {   
+                    GL.TexImage2D(TextureTarget2d.Texture2D, 0, (TextureComponentCount)glInternalFormat, image.Width, image.Height, 0, PixelFormat.Bgra, (PixelType)glType, image.GetPixels());
                     textureProperties["maxMipLevel"] = 0;
-
-
                 }
 
             }
 
             if (TextureNeedsGenerateMipmaps(texture, supportsMips))
             {
-
                 GenerateMipmap(textureType, texture, image.Width, image.Height);
-
             }
 
             textureProperties["version"] = texture.version;
-            //if ( texture.onUpdate ) texture.onUpdate( texture );
         }
 
         public void SetupFrameBufferTexture(int framebuffer, GLRenderTarget renderTarget, All attachment, All textureTarget)
@@ -993,20 +931,14 @@ namespace THREE
 
             if (renderTarget.depthBuffer && !renderTarget.stencilBuffer)
             {
-
                 if (isMultisample)
                 {
-
                     var samples = GetRenderTargetSamples(renderTarget);
-
                     GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, RenderbufferInternalFormat.DepthComponent16, renderTarget.Width, renderTarget.Height);
-
                 }
                 else
                 {
-
                     GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, renderTarget.Width, renderTarget.Height);
-
                 }
 
                 GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
@@ -1017,45 +949,31 @@ namespace THREE
 
                 if (isMultisample)
                 {
-
                     var samples = GetRenderTargetSamples(renderTarget);
-
-
                     GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, RenderbufferInternalFormat.Depth24Stencil8, renderTarget.Width, renderTarget.Height);
-
                 }
                 else
                 {
                     GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.Depth24Stencil8, renderTarget.Width, renderTarget.Height);
-
                 }
 
-
                 GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, RenderbufferTarget.Renderbuffer, renderbuffer);
-
             }
             else
             {
-
                 var glFormat = utils.Convert(renderTarget.Texture.Format);
                 var glType = utils.Convert(renderTarget.Texture.Type);
                 var glInternalFormat = GetInternalFormat(renderTarget.Texture.InternalFormat, (int)glFormat, (int)glType);
 
                 if (isMultisample)
                 {
-
                     var samples = GetRenderTargetSamples(renderTarget);
-
                     GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, (RenderbufferInternalFormat)glInternalFormat, renderTarget.Width, renderTarget.Height);
-
                 }
                 else
                 {
-
                     GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, (RenderbufferInternalFormat)glInternalFormat, renderTarget.Width, renderTarget.Height);
-
                 }
-
             }
 
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
@@ -1063,58 +981,57 @@ namespace THREE
 
         public void SetupDepthTexture(int framebuffer, GLRenderTarget renderTarget)
         {
-            var isCube = (renderTarget != null && renderTarget is GLCubeRenderTarget);
-            if (isCube) throw new Exception("Depth Texture with cube render targets is not supported");
+            if (renderTarget is GLCubeRenderTarget)
+            {
+                throw new Exception("Depth Texture with cube render targets is not supported");
+            }
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 
-            if (!(renderTarget.depthTexture != null && renderTarget.depthTexture is DepthTexture))
+            if (!(renderTarget.depthTexture is DepthTexture))
             {
-
                 throw new Exception("renderTarget.depthTexture must be an instance of THREE.DepthTexture");
-
             }
 
-            // upload an empty depth texture with framebuffer size
-            if (properties.Get(renderTarget.depthTexture)["glTexture"] != null ||
-                    renderTarget.depthTexture.ImageSize.Width != renderTarget.Width ||
-                    renderTarget.depthTexture.ImageSize.Height != renderTarget.Height)
+            // Check if depth texture needs resizing
+            if (renderTarget.depthTexture.ImageSize.Width != renderTarget.Width ||
+                renderTarget.depthTexture.ImageSize.Height != renderTarget.Height ||
+                !properties.Get(renderTarget.depthTexture).ContainsKey("glTexture"))
             {
-
                 renderTarget.depthTexture.ImageSize.Width = renderTarget.Width;
                 renderTarget.depthTexture.ImageSize.Height = renderTarget.Height;
                 renderTarget.depthTexture.NeedsUpdate = true;
 
+                if (!properties.Get(renderTarget.depthTexture).ContainsKey("glTexture"))
+                {
+                    properties.Get(renderTarget.depthTexture)["glTexture"] = GL.GenTexture();
+                }
             }
 
             SetTexture2D(renderTarget.depthTexture, 0);
 
-            var glDepthTexture = (int)properties.Get(renderTarget.depthTexture)["glTexture"];
+            int glDepthTexture = (int)properties.Get(renderTarget.depthTexture)["glTexture"];
 
             if (renderTarget.depthTexture.Format == Constants.DepthFormat)
             {
-
                 GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget2d.Texture2D, glDepthTexture, 0);
-
             }
             else if (renderTarget.depthTexture.Format == Constants.DepthStencilFormat)
             {
-
                 GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, TextureTarget2d.Texture2D, glDepthTexture, 0);
-
             }
             else
             {
-
                 throw new Exception("Unknown depthTexture format");
-
             }
+
+            // Unbind framebuffer to prevent accidental modifications
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
         public void SetupDepthRenderbuffer(GLRenderTarget renderTarget)
         {
             var renderTargetProperties = properties.Get(renderTarget);
-
             var isCube = renderTarget is GLCubeRenderTarget;
 
             if (renderTarget.depthTexture != null)
@@ -1127,12 +1044,11 @@ namespace THREE
             }
             else
             {
-
                 if (isCube)
                 {
-
                     int[] depthbuffer = new int[6];
                     int[] framebuffer = (int[])renderTargetProperties["glFramebuffer"];
+                 
                     for (var i = 0; i < 6; i++)
                     {
 
@@ -1142,18 +1058,14 @@ namespace THREE
 
                     }
                     renderTargetProperties["glDepthbuffer"] = depthbuffer;
-
                 }
                 else
                 {
-
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, (int)renderTargetProperties["glFramebuffer"]);
                     var buffer = GL.GenRenderbuffer();
                     renderTargetProperties["glDepthbuffer"] = buffer;
                     SetupRenderBufferStorage((int)renderTargetProperties["glDepthbuffer"], renderTarget, false);
-
                 }
-
             }
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
@@ -1173,33 +1085,24 @@ namespace THREE
 
             };
 
-
             textureProperties["glTexture"] = GL.GenTexture();
-
             info.memory.Textures++;
-
             var isCube = renderTarget is GLCubeRenderTarget;
             var isMultisample = renderTarget is GLMultisampleRenderTarget;
-            //var isMultiview =  renderTarget is GLMultiviewRenderTarget;
             var supportsMips = IsPowerOfTwo(renderTarget) || IsGL2;
 
             // Setup framebuffer
-
             if (isCube)
             {
-
                 //renderTargetProperties.__webglFramebuffer = [];
                 int[] framebuffer = new int[6];
 
                 for (var i = 0; i < 6; i++)
                 {
-
                     //renderTargetProperties.__webglFramebuffer[ i ] = _gl.createFramebuffer();
                     framebuffer[i] = GL.GenFramebuffer();
-
                 }
                 renderTargetProperties["glFramebuffer"] = framebuffer;
-
             }
             else
             {
@@ -1295,9 +1198,7 @@ namespace THREE
 
             if (renderTarget.depthBuffer)
             {
-
                 SetupDepthRenderbuffer(renderTarget);
-
             }
         }
         private void OnRenderTargetDispose()
@@ -1420,17 +1321,14 @@ namespace THREE
             {
 
                 // CompressedTexture can have Array in image :/
-
                 // this function alone should take care of cube textures
                 SetTextureCube(texture, slot);
 
             }
             else
             {
-
                 // assumed: texture property of THREE.WebGLRenderTargetCube
                 SetTextureCubeDynamic(texture, slot);
-
             }
         }
     }

@@ -1350,9 +1350,11 @@ namespace THREE
                     // the following if statement ensures valid read requests (no out-of-bounds pixels, see Three.js Issue #8604)
                     if ((x >= 0 && x <= (renderTarget.Width - width)) && (y >= 0 && y <= (renderTarget.Height - height)))
                     {
-                        GL.ReadPixels((int)x, (int)y, width, height, utils.Convert(textureFormat), utils.Convert(textureType), buffer);
+                        if ((x >= 0 && x <= (renderTarget.Width - width)) && (y >= 0 && y <= (renderTarget.Height - height)))
+                        {
+                            GL.ReadPixels((int)x, (int)y, width, height, (PixelFormat)utils.Convert(textureFormat), (PixelType)utils.Convert(textureType), buffer);
+                        }                        
                     }
-
                 }
                 finally
                 {

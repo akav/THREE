@@ -1,8 +1,8 @@
 using System.Windows.Forms;
+using OpenTK.GLControl;
 using OpenTK.Graphics.ES30;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.WinForms;
 using THREE;
 using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 namespace SingleFormsDemo
@@ -46,7 +46,6 @@ namespace SingleFormsDemo
 
         private void glControl_Load(object sender, EventArgs e)
         {
-            this.glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
             threeInstance = new THREEAppInstance();
             threeInstance.Load(glControl);
             threeInstance.OnResize(new ResizeEventArgs(glControl.ClientSize.Width, glControl.ClientSize.Height));

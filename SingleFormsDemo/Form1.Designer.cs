@@ -1,4 +1,6 @@
-﻿namespace SingleFormsDemo
+﻿using OpenTK.Windowing.Common;
+
+namespace SingleFormsDemo
 {
     partial class Form1
     {
@@ -28,7 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            glControl = new OpenTK.WinForms.GLControl();
+            glControl = new OpenTK.GLControl.GLControl();
             SuspendLayout();
             // 
             // glControl
@@ -40,10 +42,10 @@
             glControl.IsEventDriven = true;
             glControl.Location = new Point(0, 0);
             glControl.Name = "glControl";
-            glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
             glControl.Size = new Size(800, 450);
             glControl.TabIndex = 0;
             glControl.Text = "glControl1";
+            glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
             glControl.Load += glControl_Load;
             glControl.Paint += glControl_Paint;
             glControl.KeyDown += glControl_KeyDown;
@@ -67,6 +69,6 @@
 
         #endregion
 
-        private OpenTK.WinForms.GLControl glControl;
+        private OpenTK.GLControl.GLControl glControl;
     }
 }

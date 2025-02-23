@@ -34,7 +34,7 @@ namespace THREE
             int indices = start * this.bytesPerElement;
             IntPtr ptr = IntPtr.Add(IntPtr.Zero, indices);
 
-            GL.DrawElements((All)mode, count, (All)type, ptr);
+            GL.DrawElements((PrimitiveType)mode, count, (DrawElementsType)type, ptr);
 
             info.Update(count, (int)mode);
         }
@@ -44,12 +44,11 @@ namespace THREE
             if (primcount == 0) return;
 
             int indices = start * this.bytesPerElement;
-            IntPtr ptr = IntPtr.Add(IntPtr.Zero, indices);            
+            IntPtr ptr = IntPtr.Add(IntPtr.Zero, indices);
 
-            GL.DrawElementsInstanced((All)mode, count, (All)type, ptr, primcount);
+            GL.DrawElementsInstanced((PrimitiveType)mode, count, (DrawElementsType)type, ptr, primcount);
 
             info.Update(count, (int)mode, primcount);
-
         }
     }
 }

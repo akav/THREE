@@ -1,6 +1,5 @@
-﻿using OpenTK.Graphics;
+﻿using OpenTK.GLControl;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.Common;
 using System;
 
 namespace WPFDemo.Controls
@@ -27,6 +26,10 @@ namespace WPFDemo.Controls
 
         private void InitGLContext()
         {
+#if NET6_0_OR_GREATER
+            this.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
+#endif
+
             this.MakeCurrent();
             //this.VSync = true;
             if (OnInitGL != null)

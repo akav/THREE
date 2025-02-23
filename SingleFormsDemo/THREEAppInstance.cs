@@ -1,5 +1,5 @@
-﻿using OpenTK.Windowing.Common;
-using OpenTK.WinForms;
+﻿using OpenTK.GLControl;
+using OpenTK.Windowing.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -134,6 +134,9 @@ namespace FormsDemo
             glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Core;
             glControl.Size = new Size(646, 516);
             glControl.TabIndex = 1;
+#if NET6_0_OR_GREATER
+            glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
+#endif
             glControl.Load += glControl_Load;
             glControl.Paint += glControl_Paint;
             glControl.KeyDown += glControl_KeyDown;

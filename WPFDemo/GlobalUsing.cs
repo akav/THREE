@@ -1,1 +1,1 @@
-﻿global using GLControl = OpenTK.WinForms.GLControl;
+﻿global using GLControl = OpenTK.GLControl.GLControl;

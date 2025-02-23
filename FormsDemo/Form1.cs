@@ -192,9 +192,7 @@ namespace FormsDemo
                 GL.GetString(StringName.Vendor) + " " +
                 GL.GetString(StringName.Renderer) + " " +
                 GL.GetString(StringName.Version);
-#if NET6_0_OR_GREATER
-            this.glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
-#endif
+
             statusStrip1.Text = string.Empty;
 
             imGuiManager = new ImGuiManager(glControl);

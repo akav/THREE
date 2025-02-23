@@ -64,9 +64,6 @@ namespace WPFDemo
 
                         var treeItem = new TreeViewItem();
                         treeItem.Header = example.Title;
-
-                        //int u = (int)(example.LevelComplete * 5);
-                        //treeItem.Foreground = new SolidColorBrush(loC[u]);
                         treeItem.Tag = new ExampleInfo(type, example);
 
                         rootItem.Items.Add(treeItem);
@@ -133,9 +130,7 @@ namespace WPFDemo
             }
             currentExample = (Example)Activator.CreateInstance(info.Example);
             GLRenderControl glControl = new GLRenderControl();
-#if NET6_0_OR_GREATER
-            glControl.Profile = OpenTK.Windowing.Common.ContextProfile.Compatability;
-#endif
+
             currentExample.Load(glControl);
             currentExample.imGuiManager = new THREEExample.ThreeImGui.ImGuiManager(glControl);
             currentWindow = new GLRenderWindow(currentExample);
